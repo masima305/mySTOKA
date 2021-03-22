@@ -1,0 +1,259 @@
+{% extends 'ledgbook/ledgbook_sidebar.html' %}
+{% block bookRich %}
+<script type="text/javascript">
+    $(document).ready(function (){
+        //종목검색 Enter
+        $("#schStockNm").keypress(function (e){
+            if (e.keyCode == 13) {
+                searchStockName();
+            }
+        });
+
+        $("#schStockNmBtn").click(function(){
+            searchStockName();
+        });
+
+        //카테고리 선택하면 히든값에 해당 카테고리 임시저장
+        $(".nav-link").click(function(){
+            var tmpId = $(this).attr("id").split("-")[2];
+            if(tmpId == "reg"){
+                tmpId = ""
+            }
+            $("#selectedCatheNum").val(tmpId)  // cathe_num 추출
+
+        });
+    }); // .ready()
+
+    function searchStockName(){
+         data = {
+                 "sch_stock_nm": $("#schStockNm").val()
+         };
+
+        $.ajax({
+            url: "{% url 'sch_stock_list' %}"
+            , dataType: "json"
+            , data: JSON.stringify(data)
+            , method: "POST"
+            , success: function (data) {
+
+                var tmpRow = ""
+                var stockNm
+                var stockNum
+                $("#schStockList").empty();
+                for(var i = 0 ; i < data.length ; i ++){
+                    stockNm = data[i].fields.stock_name;
+                    stockNum = data[i].fields.stock_num;
+
+                    tmpRow  =   "<tr>"
+                            +       "<td>"+stockNm+"</td>"
+                            +       "<td>"+stockNum+"</td>"
+                            +       "<td>"
+                            +           "<span class='btn btn-rounded btn-secondary btn-xs'"
+                            +               " onclick='addStockToCathe(\""+stockNm+"\",\""+stockNum+"\")'>추가"
+                            +           "</span>"
+                            +       "</td>"
+                            +   "</tr>"
+                            ;
+
+                    $("#schStockList").append(tmpRow)
+                    // console.log(data[i].fields.stock_name)
+                   // console.log(data[i].fields.stock_num)
+                }
+            }
+            , error: function (request, status, error) {
+                console.log('실패');
+            }
+        });
+    }
+
+    // 카테고리에 주식종목 추가.
+    function addStockToCathe(stockNm, stockNum){
+        var catheNum =
+
+        data = {
+                   "stock_num" : stockNum
+                 , "cathe_num" : $("#selectedCatheNum").val()
+            };
+
+        $.ajax({
+            url: "{% url 'add_stock_cathe' %}"
+            , dataType: "json"
+            , data: JSON.stringify(data)
+            , method: "POST"
+            , success: function (data) {
+                for(var i = 0 ; i < data.length ; i ++){
+                    console.log(data)
+
+                    tmpRow  =   "<tr>"
+                            +       "<td>"+stockNm+"</td>"
+                            +       "<td>"+stockNum+"</td>"
+                            +       "<td>미구현</td>"
+                            +       "<td>"
+                            +           "<span class='btn btn-rounded btn-secondary btn-xs'"
+                            +               " onclick='deleteStockfromCathe("+stockNm+","+stockNum+")'>삭제"
+                            +           "</span>"
+                            +       "</td>"
+                            +   "</tr>"
+                            ;
+
+                    $("#v-tbody-"+catheNum).append(tmpRow)
+                    // console.log(data[i].fields.stock_name)
+                   // console.log(data[i].fields.stock_num)
+                }
+            }
+            , error: function (request, status, error) {
+                console.log('실패');
+            }
+        });
+
+
+
+    }
+
+</script>
+<input id="selectedCatheNum" type="hidden" value=""/>
+<div class="section-block">
+    <h2 class="section-title">카테고리 및 종목</h2>
+</div>
+<!-- ============================================================== -->
+<!-- vertical pills  -->
+<!-- ============================================================== -->
+<div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12 mb-5">
+    <div class="pills-vertical">
+        <div class="row">
+            <div class="col-xl-2 col-lg-2 col-md-6 col-sm-12 col-12">
+                <div class="nav flex-column nav-pills" id="v-pills-tab" role="tablist" aria-orientation="vertical">
+                    <a style="text-align: center" class="nav-link" id="v-pills-reg-tab" data-toggle="pill" href="#v-pills-reg" role="tab" aria-controls="v-pills-reg" aria-selected="true">
+                        <i style="font-size: 1.5em;" class="fa fa-plus-circle"></i>
+                    </a>
+                    {% for cathe in cathe_list %}
+                        <a class="nav-link" id="v-pills-{{cathe.cathe_num}}-tab" data-toggle="pill" href="#v-pills-{{cathe.cathe_num}}" role="tab" aria-controls="v-pills-{{cathe.cathe_num}}" aria-selected="true">{{cathe.cathe_name}}</a>
+<!--                                            <a class="nav-link active" id="v-pills-home-tab" data-toggle="pill" href="#v-pills-home" role="tab" aria-controls="v-pills-home" aria-selected="true">Tab#1</a>-->
+<!--                                            <a class="nav-link" id="v-pills-profile-tab" data-toggle="pill" href="#v-pills-profile" role="tab" aria-controls="v-pills-profile" aria-selected="false">Tab#2</a>-->
+<!--                                            <a class="nav-link" id="v-pills-messages-tab" data-toggle="pill" href="#v-pills-messages" role="tab" aria-controls="v-pills-messages" aria-selected="false">Tab#3</a>-->
+<!--                                            <a class="nav-link" id="v-pills-settings-tab" data-toggle="pill" href="#v-pills-settings" role="tab" aria-controls="v-pills-settings" aria-selected="false">Tab#4</a>-->
+                    {% endfor %}
+                </div>
+            </div>
+            <div class="col-xl-7 col-lg-7 col-md-12 col-sm-12 col-12 ">
+                <div class="tab-content" id="v-pills-tabContent">
+
+                    <div class="tab-pane fade show active" id="" role="tabpanel" aria-labelledby="v-pills-home-{{cathe.cathe_num}}">
+                            <h3 class="mb-0">
+                                카테고리를 선택해주세요
+                            </h3>
+                        <hr/>
+                    </div>
+
+                    <div class="tab-pane fade show" id="v-pills-reg" role="tabpanel" aria-labelledby="v-pills-home-reg">
+                        <div class="row">
+                            <div class="col-xl-9 col-lg-9 col-md-9 col-sm-9 col-9">
+                                <h3>
+                                    <input style="width: 100%;" type="text" placeholder="카테고리 이름을 입력해주세요">
+                                </h3>
+                                <h4>
+                                    <input style="width: 100%;" type="text" placeholder="키워드를 입력해주세요">
+                                </h4>
+                            </div>
+                            <div style="text-align: right" class="col-xl-3 col-lg-3 col-md-3 col-sm-3 col-3">
+                                <span class="btn btn-primary">저장</span>
+                            </div>
+                        </div>
+                        <hr/>
+                        <div class="row">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">카테고리명</th>
+                                        <th scope="col">키워드</th>
+                                        <th scope="col">기능</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for cathe in cathe_list %}
+                                        <tr>
+                                            <td>{{cathe.cathe_name}}</td>
+                                            <td>{{cathe.cathe_keyword}}</td>
+                                            <td>
+                                                <span href="#" class="btn btn-rounded btn-secondary btn-xs">
+                                                    삭제
+                                                </span>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- 종목 리스트 -->
+                    {% for cathe in cathe_list %}
+                        <div class="tab-pane fade show " id="v-pills-{{cathe.cathe_num}}" role="tabpanel" aria-labelledby="v-pills-home-{{cathe.cathe_num}}">
+                            <div class="row">
+                                <!-- 종목명 -->
+                                <div class="col-xl-9 col-lg-9 col-md-9 col-sm-9 col-9">
+                                    <h3>
+                                        {{cathe.cathe_name}}
+                                    </h3>
+                                </div>
+                                <div style="text-align: right" class="col-xl-3 col-lg-3 col-md-3 col-sm-3 col-3">
+                                    <span class="btn btn-brand">수정</span>
+                                </div>
+                            </div>
+                            <hr/>
+                            <!-- row start -->
+                            <div class="row">
+                                <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+                                    <table class="table table-striped">
+                                        <thead>4
+                                            <tr>
+                                                <th scope="col">종목명</th>
+                                                <th scope="col">종목번호</th>
+                                                <th scope="col">추적여부</th>
+                                                <th scope="col">기능</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="v-tbody-{{cathe.cathe_num}}">
+                                            <tr>
+                                                <td>Mark</td>
+                                                <td>Otto</td>
+                                                <td>Otto</td>
+                                                <td>Otto</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <!-- row end -->
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+            <div class="col-xl-3 col-lg-3 col-md-12 col-sm-12 col-12">
+                <div class="card">
+                    <h3 class="card-header">종목 추가</h3>
+                    <div class="card-body">
+                        <input id="schStockNm" type="text" placeholder="종목명"/>
+                        <span id="schStockNmBtn" class="btn btn-primary btn-xs">검색</span>
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th scope="col">종목명</th>
+                                    <th scope="col">종목번호</th>
+                                    <th scope="col"></th>
+                                </tr>
+                            </thead>
+                            <tbody id="schStockList">
+                            </tbody>
+                        </table>
+                    </div><!-- card body -->
+                </div><!-- card -->
+            </div><!-- row grid -->
+        </div>
+    </div>
+</div>
+<!-- ============================================================== -->
+<!-- end vertical pills  -->
+<!-- ============================================================== -->
+
+{% endblock bookRich%}

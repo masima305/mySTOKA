@@ -1,0 +1,9 @@
+{% extends 'ledgbook/ledgbook_sidebar.html' %}
+
+{% block content %}
+   {% for post in posts %}
+        <p>{{ post.published_date }}</p>
+        <p><a href="{% url 'post_detail' pk=post.pk %}"{ post.title }</p>
+        <p>{{ post.text|linebreaksbr }}</p>
+    {% endfor %}
+{% endblock %}

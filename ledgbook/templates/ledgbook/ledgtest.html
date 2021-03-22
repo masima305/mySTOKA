@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+    <div id="bookMain">
+        <table>
+            <th>id</th>
+            <th>생성일</th>
+            <th>연도</th>
+            <th>월</th>
+            <th>차수</th>
+            <th>이전잔고</th>
+            <th>추가입금</th>
+            <th>수익</th>
+            <th>증감</th>
+            <th>증감율</th>
+            <th>목표추가입금</th>
+            <th>목표증감율</th>
+            <th>목표수익</th>
+            <th>목표잔고</th>
+            <th>현황금액</th>
+            <th>투자액</th>
+            <th>분기별 성장율</th>
+            <span id="addArea">
+                <tr>
+                    <td><input type="text"></td>
+                    <td><input type="text"></td>
+                    <td><input type="text"></td>
+                    <td><input type="text"></td>
+                    <td><input type="text"></td>
+                    <td><input type="text"></td>
+                    <td><input type="text"></td>
+                    <td><input type="text"></td>
+                    <td><input type="text"></td>
+                    <td><input type="text"></td>
+                    <td><input type="text"></td>
+                    <td><input type="text"></td>
+                    <td><input type="text"></td>
+                    <td><input type="text"></td>
+                    <td><input type="text"></td>
+                    <td><input type="text"></td>
+                    <td><input type="text"></td>
+                </tr>
+            </span>
+            <div id="showArea">
+                {% for bookmain in bookmains %}
+                    <td>{{bookmain.user_id_id}}</td> <!-- id -->
+                    <td>{{bookmain.created_date}}</td> <!-- 생성일 -->
+                    <td>{{bookmain.year}}</td> <!-- 연도 -->
+                    <td>{{bookmain.month}}</td> <!-- 월 -->
+                    <td>{{bookmain.degree}}</td> <!-- 차수 -->
+                    <td>{{bookmain.prv_balance}}</td> <!-- 이전잔고 -->
+                    <td>{{bookmain.add_deposit}}</td> <!-- 추가입금 -->
+                    <td>{{bookmain.revenue}}</td> <!-- 수익 -->
+                    <td>{{bookmain.change}}</td> <!-- 증감 -->
+                    <td>{{bookmain.change_rate}}</td> <!-- 증감율 -->
+                    <td>{{bookmain.trgt_add_deposit}}</td> <!-- 목표 추가입금 -->
+                    <td>{{bookmain.trgt_change_rate}}</td> <!-- 목표 증감율 -->
+                    <td>{{bookmain.trgt_revenue}}</td> <!-- 목표 수익 -->
+                    <td>{{bookmain.trgt_cur_balance}}</td> <!-- 목표 잔고 -->
+                    <td>{{bookmain.cur_balance}}</td> <!-- 현황 금액 -->
+                    <td>{{bookmain.invst_balance}}</td> <!-- 투자액 -->
+                    <td>{{bookmain.qtr_growth}}</td> <!-- 분기별 성장률 -->
+                {% endfor %}
+<!--
+                보는 부분
+                user_id = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+                 = models.DateTimeField(default=timezone.now)
+                 = models.CharField(max_length=10)  # 연도
+                 = models.CharField(max_length=6)  # 월
+                 = models.IntegerField            # 차수
+                 = models.IntegerField       # 이전잔고
+                 = models.IntegerField       # 추가입금
+                 = models.IntegerField           # 수익
+                 = models.IntegerField            # 증감
+                 = models.FloatField         # 증감율
+                 = models.IntegerField  # 목표 추가입금
+                 = models.FloatField    # 목표 증감율
+                 = models.IntegerField      # 목표 수익
+                 = models.IntegerField  # 목표 잔고
+                 = models.IntegerField       # 현황금액
+                 = models.IntegerField     # 투자액
+                 = models.FloatField          # 분기별 성장률
+                -->
+            </div>
+        </table>
+    </div>
+</body>
+</html>

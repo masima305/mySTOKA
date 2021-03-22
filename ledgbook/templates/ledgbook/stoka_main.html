@@ -1,0 +1,85 @@
+{% extends 'ledgbook/ledgbook_sidebar.html' %}
+{% block bookRich %}
+<script type="text/javascript">
+    $(document).ready(function (){
+        //저장버튼
+        $("#btnStokaResync").click(function() {
+            data = {
+                 "dummy": "dummy"
+            };
+
+            $.ajax({
+                url: "{% url 'resync_stocks' %}",
+                dataType: "json",
+                method: "POST",
+                success: function (data) {
+                    alert("성공적으로 저장되었습니다.");
+                    console.log(data.context);
+                },
+                error: function (request, status, error) {
+                    console.log('실패');
+                }
+            });
+        });//저장버튼 끝
+    });
+</script>
+<div class="section-block">
+    <h2 class="section-title">STOKA 설정</h2>
+    <p>STOKA </p>
+    <!--TODO : 개인정보 테이블을 만들면 개인에 따른 목표일 스냅샷을 찍을 수 있도록 만들어 주고싶다. -->
+    <span class="btn btn-primary" id="btnStokaResync">저장</span>
+</div>
+<div class="row">
+<!-- ============================================================== -->
+<!-- basic table  -->
+<!-- ============================================================== -->
+    <!--  임시공간 -->
+    <input type="hidden" id="total_cur_balance">
+    <input type="hidden" id="total_year" value="{{total_year}}">
+    <input type="hidden" id="total_month" value="{{total_month}}">
+</div>
+<div class="row">
+    <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+        <div class="card">
+            <h5 class="card-header">주식추천</h5>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-striped table-bordered first" id="gettingRich">
+                        <thead>
+                            <tr>
+                                <!--  <th>id</th> -->
+                                <!--  <th>생성일</th> -->
+                                <th>순번</th>
+                                <th>종목명</th>
+                                <th>기준월</th>
+                                <th>PER</th>
+                                <th>추정PER</th>
+                                <th>업데이트일</th>
+                            </tr>
+                        </thead>
+                        <tbody id="bookRecords">
+                            {% if stock_info_list %}
+                                {% for stock_info in stock_info_list %}
+                                <tr>
+                                        <td>idx</td>
+                                        <td>{{stock_info.stock_name}}</td>        <!-- 종목명  -->
+                                        <td>{{stock_info.stock_month_date}}</td>  <!-- 종목기준 -->
+                                        <td>{{stock_info.stock_per}}</td>         <!-- 종목PER -->
+                                        <td>{{stock_info.stock_suspct_per}}</td>  <!-- 추정PER -->
+                                        <td>{{stock_info.stock_updt}}</td> <!-- 업데이트 날짜 -->
+
+                                    </tr>
+                                {% endfor %}
+                            {% endif %}
+                            <!-- TODO: CSS  노가다 -->
+                        </tbody>
+                    </table>
+s                </div>
+            </div>
+        </div>
+    </div>
+    <!-- ============================================================== -->
+    <!-- end basic table  -->
+    <!-- ============================================================== -->
+</div><!-- row -->
+{% endblock bookRich%}

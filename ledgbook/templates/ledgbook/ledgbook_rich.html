@@ -1,0 +1,601 @@
+{% extends 'ledgbook/ledgbook_sidebar.html' %}
+{% block bookRich %}
+<script type="text/javascript">
+    $(document).ready(function (){
+        //최초 현황 체크
+        currentSetting();
+        futureSetting();
+        goalAreaSetting();
+
+        //부자가되어봅시다 숫자 입력부분에 적용할 change
+        $("#gettingRich input").on("change keyup",function(){
+            $(this).val($(this).val().replace(/[^-0-9]/g,""));
+            futureSetting();
+        });
+
+        //목표설정 인풋값 예외처리
+        $("#bookSetttings input").on("change keyup",function(){
+            $(this).val($(this).val().replace(/[^-0-9]/g,""));
+        })
+
+        // 년도 select box일때 확인해서 10년치 넣어줌.
+        if(($("#year").is('select'))){
+            var nowYear = new Date().getFullYear();
+            for (var i = nowYear ; i > nowYear-10 ; i--){
+            $("#year").append($("<option value='"+i+"'>"+i+"</option>"));
+            }
+        }
+
+        <!-- TODO : 버튼 통합할 수 있을거같은데 통합하도록 하자. -->
+
+        //저장버튼
+        $("#btnSaveledgUpdate").click(function() {
+            data = {
+                 "year": $("#year").text()
+                , "month": $("#month").text()
+                , "degree": $("#thisDegree").val()
+                , "prv_balance": $("#thisPrvBalance").val()
+                , "add_deposit": $("#thisAddDeposit").val()
+                , "revenue": $("#thisRevenue").val()
+                , "change": $("#thisChange").text()
+                , "change_rate": $("#thisChangeRate").text()
+                , "trgt_add_deposit": $("#thisTrgtAddDeposit").text()
+                , "trgt_change_rate": $("#thisTrgtChangeRate").text()
+                , "trgt_revenue": $("#thisTrgtRevenue").text()
+                , "trgt_cur_balance": $("#thisTrgtCurBalance").text()
+                , "cur_balance": $("#thisCurBalance").text()
+                , "achievement_rate": $("#achievementRate").text().replaceAll("%", "").trim()
+                , "finished_yn": "N"
+                //"invst_balance" :     # 투자액
+                //"created_date"
+            };
+
+            $.ajax({
+                url: "{% url 'saveledg_update' %}",
+                dataType: "json",
+                method: "POST",
+                data: JSON.stringify(data),
+                success: function (data) {
+
+                    alert("성공적으로 저장되었습니다");
+                    location.reload();
+                },
+                error: function (request, status, error) {
+                    console.log('실패');
+                }
+            });
+        });//저장버튼 끝
+
+        // 마감 버튼
+        $("#btnSaveledgClosing").click(function() {
+
+            if( ! confirm("월마감을 진행하시면 수정할 수 없습니다. 마감 하시겠습니까?")){
+                return ;
+            }
+
+            data = {
+                 "year": $("#year").text()
+                , "month": $("#month").text()
+                , "degree": $("#thisDegree").val()
+                , "prv_balance": $("#thisPrvBalance").val()
+                , "add_deposit": $("#thisAddDeposit").val()
+                , "revenue": $("#thisRevenue").val()
+                , "change": $("#thisChange").text()
+                , "change_rate": $("#thisChangeRate").text()
+                , "trgt_add_deposit": $("#thisTrgtAddDeposit").text()
+                , "trgt_change_rate": $("#thisTrgtChangeRate").text()
+                , "trgt_revenue": $("#thisTrgtRevenue").text()
+                , "trgt_cur_balance": $("#thisTrgtCurBalance").text()
+                , "cur_balance": $("#thisCurBalance").text()
+                , "achievement_rate": $("#achievementRate").text().replaceAll("%", "").trim()
+                , "finished_yn": "Y"
+                //"invst_balance" :     # 투자액
+                //"created_date"
+            };
+
+            $.ajax({
+                url: "{% url 'saveledg_update' %}",
+                dataType: "json",
+                method: "POST",
+                data: JSON.stringify(data),
+                success: function (data) {
+
+                    alert("성공적으로 저장되었습니다.");
+                    location.reload();
+                },
+                error: function (request, status, error) {
+                    console.log('실패');
+                }
+            });
+        });
+
+        // 신규등록
+        $("#btnSaveledgNew").click(function(){
+            var year        = $("#year").val()
+            var month       = $("#month").val()
+            var thisPrvBalance = $("#thisPrvBalance").val()
+
+            if( year == "" || year == null){
+                year = $("#year").text()
+                month = $("#month").text()
+                thisPrvBalance = $("#thisPrvBalance").text()
+            }
+
+           data = {
+                "year"                  : year
+                , "month"               : month
+                , "degree"              : "1"
+                , "prv_balance"         : thisPrvBalance
+                , "add_deposit"         : $("#thisAddDeposit"    ).val()
+                , "revenue"             : $("#thisRevenue"       ).val()
+                , "change"              : $("#thisChange"        ).text()
+                , "change_rate"         : $("#thisChangeRate"    ).text()
+                , "trgt_add_deposit"    : $("#thisTrgtAddDeposit").text()
+                , "trgt_change_rate"    : $("#thisTrgtChangeRate").text()
+                , "trgt_revenue"        : $("#thisTrgtRevenue"   ).text()
+                , "trgt_cur_balance"    : $("#thisTrgtCurBalance").text()
+                , "cur_balance"         : $("#thisCurBalance"    ).text()
+                , "achievement_rate"    : $("#achievementRate"   ).text().replaceAll("%","").trim()
+                , "finished_yn"         : "N"
+                //"invst_balance" :     # 투자액
+                //"created_date"
+            };
+
+
+           $.ajax({
+                url: "{% url 'saveledg_new' %}",
+                dataType: "json",
+                method: "POST",
+                data: JSON.stringify(data),
+                success: function (data) {
+
+                    alert("성공적으로 저장되었습니다.");
+                    location.reload();
+                },
+                error: function (request, status, error) {
+                    console.log('실패');
+                }
+           });
+        });// .click
+
+
+        // 목표설정 적용
+        $("#saveSetting").click(function(){
+
+            var settingAddDeposit = $("#settingTrgtAddDeposit").val()
+            var settingChangeRate = $("#settingTrgtChangeRate").val()
+
+            if( settingAddDeposit == "" || settingAddDeposit == null) settingAddDeposit = 0;
+            if( settingChangeRate == "" || settingChangeRate == null) settingChangeRate = 0;
+
+           data = {
+                  "setting_add_deposit"     : settingAddDeposit
+                , "setting_change_rate"   : settingChangeRate
+           };
+
+           $.ajax({
+                url: "{% url 'savePersonalSetting_update' %}",
+                dataType: "json",
+                method: "POST",
+                data: JSON.stringify(data),
+                success: function (data) {
+                    alert("성공적으로 저장되었습니다.");
+                    // TODO : 리로드 하니까 약간 쓰기 불편하다. 리로드 말고 ajax로 필요한 부분만 리로드 할 수 있게 바꿔줬으면 좋겠다.
+                    location.reload();
+                },
+                error: function (request, status, error) {
+                    console.log('실패');
+                }
+           });
+        });// .click
+
+
+
+    }); // ready;
+
+    //지금 연월차의 순서에 변경할 수 있도록 만들어준다.
+    function currentSetting (){
+
+        //날짜 입력 정리
+        var tmpdate = new Date();
+        $("#thisYear").text(tmpdate.getFullYear());
+        $("#thisMonth").text(tmpdate.getMonth()+1);
+
+    }
+
+    //앞으로의 연월차에 따른 값을 만들어준다.
+    function futureSetting(){
+
+        //현황계------------------------------------------------------
+        var thisPrvBalance;  //전월잔고
+        if($("#thisPrvBalance").text() == null || $("#thisPrvBalance").text() == ""){
+            thisPrvBalance = $("#thisPrvBalance").val()*1
+        }else{
+            thisPrvBalance = $("#thisPrvBalance").text()*1
+        }
+        var thisChange     = ($("#thisRevenue").val()*1) + ($("#thisAddDeposit").val()*1); //증감액
+        var thisCurBalance = thisPrvBalance + thisChange; //현황금액
+        var thisChangeRate =  (((thisCurBalance / thisPrvBalance)-1)*100).toFixed(1);  //증감율 = 현황금액 / 전월잔고-1 *100
+
+        //증감------------------------------------------------------
+        $("#thisChange").text(thisChange);
+        //현황금액 - 분석
+        $("#thisCurBalance").text(thisCurBalance);
+        //현황금액 반영
+        $("#thisChangeRate").text(thisChangeRate);
+
+        //목표계----------------------------------------------------
+
+        var settingTrgtAddDeposit = $("#settingTrgtAddDeposit").val()*1;
+        var settingTrgtChangeRate = $("#settingTrgtChangeRate").val()*1;
+        <!-- 목표 수익 -->
+        var thisTrgtRevenue = parseInt(thisPrvBalance*(settingTrgtChangeRate/100));
+        <!-- 목표 총액 -->
+        var thisTrgtCurBalance = thisTrgtRevenue+thisPrvBalance+settingTrgtAddDeposit;
+
+
+        $("#thisTrgtAddDeposit").text(settingTrgtAddDeposit);  // 목표 추가 입금
+        $("#thisTrgtChangeRate").text((settingTrgtChangeRate*1).toFixed(2));  // 목표 추가 입금
+
+        $("#thisTrgtChangeRate").text(settingTrgtChangeRate);  // 목표 추가 입금
+
+        //저번 총액*(목표율/100)+목표추가입금;
+        $("#thisTrgtRevenue").text(thisTrgtRevenue);
+        $("#thisTrgtCurBalance").text(thisTrgtCurBalance);
+        $("#total_cur_balance").val(thisCurBalance);
+
+
+        //달성률 계산
+        var achievementRate = (((thisCurBalance-thisPrvBalance)/(thisTrgtCurBalance-thisPrvBalance))*100).toFixed(1);
+        $("#achievementRate").text(achievementRate+" %");
+
+    }
+
+    //앞으로는...
+    function goalAreaSetting(){
+
+        var yearMonth;
+        var year = $("#total_year").val()*1;
+        var month = $("#total_month").val()*1;
+
+        var settingAddDeposit = $("#settingTrgtAddDeposit").val()*1;
+        var settingChangeRate = $("#settingTrgtChangeRate").val()*1;
+        var totalCurBalance = $("#total_cur_balance").val()*1;
+
+        var tmpBefore = totalCurBalance;
+        var tmpAfter;
+
+        for(var i = 0 ; i < 15 ; i ++){
+
+            //금액 파악
+            tmpAfter = (tmpBefore+settingAddDeposit+(tmpBefore*(0.01*settingChangeRate))).toFixed(2)*1
+
+            yearMonth = ""+year+"-"+month;
+            $("#goalArea").append(
+                "<tr>"
+                    + "<td>"+yearMonth+"</td>"
+                    + "<td>"+tmpBefore+"</td>"
+                    + "<td>"+settingChangeRate+"</td>"
+                    + "<td>"+tmpAfter+"</td>"
+                + "</tr>"
+            );
+
+            tmpBefore = tmpAfter;
+            //연도 파악
+            if(month+1 > 12){
+                month = 1;
+                year += 1;
+            }else{
+                month += 1;
+            }
+        }
+    }
+</script>
+<div class="section-block">
+        <h2 class="section-title">수익률설계</h2>
+        <p>간단한 목표 설계를 통해 앞으로 벌어들일 수익과 목표치를 계산할 수 있음</p>
+        <!--TODO : 개인정보 테이블을 만들면 개인에 따른 목표일 스냅샷을 찍을 수 있도록 만들어 주고싶다. -->
+    </div>
+<div class="row">
+<!-- ============================================================== -->
+<!-- basic table  -->
+<!-- ============================================================== -->
+    <!--  임시공간 -->
+    <input type="hidden" id="total_cur_balance">
+    <input type="hidden" id="total_year" value="{{total_year}}">
+    <input type="hidden" id="total_month" value="{{total_month}}">
+
+
+    <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 col-12">
+        <div class="accrodion-regular">
+            <div id="accordion3">
+                <div class="card">
+                    <div class="card-header" id="headingSeven">
+                        <h5 class="mb-0">
+                            <button class="btn btn-link" data-toggle="collapse" data-target="#collapseSeven" aria-expanded="true" aria-controls="collapseSeven">
+                                <span class="fas fa-angle-down mr-3"></span>목표설정
+                           </button>
+                        </h5>
+                    </div>
+                    <!-- 열려있는 모양으로 만들고 싶을때 -->
+                    <!--<div id="collapseSeven" class="collapse show" aria-labelledby="headingSeven" data-parent="#accordion3">-->
+                    <div id="collapseSeven" class="collapse" aria-labelledby="headingSeven" data-parent="#accordion3">
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-striped table-bordered first">
+                                    <thead>
+                                        <tr>
+                                            <th>목표추가입금</th>
+                                            <th>목표율</th>
+                                            <th>기능</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="bookSetttings">
+                                        <tr>
+                                            <td>
+                                                <input id="settingTrgtAddDeposit" type="text" value="{{personalSetting.setting_add_deposit}}"/> 원
+                                            </td>
+                                            <td>
+                                                <input id="settingTrgtChangeRate" type="text" value="{{personalSetting.setting_change_rate}}"/> %
+                                            </td>
+                                            <td>
+                                                <a href="#" class="btn btn-secondary" id="saveSetting">적용</a>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-6 col-lg-6 col-md-12 col-sm-12 col-12">
+        <div class="accrodion-regular">
+            <div id="accordion4">
+                <div class="card">
+                    <div class="card-header" id="headingStat">
+                        <h5 class="mb-0">
+                            <button class="btn btn-link" data-toggle="collapse" data-target="#collapseStat" aria-expanded="true" aria-controls="collapseStat">
+                                <span class="fas fa-angle-down mr-3"></span>통계
+                           </button>
+                        </h5>
+                    </div>
+                    <!-- 열려있는 모양으로 만들고 싶을때 -->
+                    <!--<div id="collapseSeven" class="collapse show" aria-labelledby="headingSeven" data-parent="#accordion3">-->
+                    <div id="collapseStat" class="collapse" aria-labelledby="headingStat" data-parent="#accordion3">
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-striped table-bordered first">
+
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div><!-- row -->
+<div class="row">
+    <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+        <div class="card">
+            <h5 class="card-header">부자가 되어 봅시다</h5>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-striped table-bordered first" id="gettingRich">
+                        <thead>
+                            <tr>
+                                <!--  <th>id</th> -->
+                                <!--  <th>생성일</th> -->
+                                <th colspan="7">현황</th>
+                                <th colspan="4">목표</th>
+                                <th colspan="3">분석</th>
+                            </tr>
+                            <tr>
+                                <!--  <th>id</th> -->
+                                <!--  <th>생성일</th> -->
+                                <th>연도</th>
+                                <th>월</th>
+                                <th>이전잔고</th>
+                                <th>추가입금</th>
+                                <th>수익</th>
+                                <th>증감</th>
+                                <th>증감율</th>
+                                <th>목표추가입금</th>
+                                <th>목표율</th>
+                                <th>목표수익</th>
+                                <th>목표잔고</th>
+                                <th>현황금액</th>
+                                <th>달성률</th>
+                                <th>기능</th>
+                            </tr>
+                        </thead>
+                        <tbody id="bookRecords">
+                            {% if bookmains %}
+                                {% for bookmain in bookmains %}
+                                    {% if bookmain.finished_yn == "Y" %}
+                                        <tr>
+                                            <!-- <td>{{bookmain.user_id_id}}</td>         id -->
+                                            <!-- <td>{{bookmain.created_date|date:'Y-m'}}</td>      생성일 -->
+                                            <td>{{bookmain.year}}</td>              <!-- 연도 -->
+                                            <td>{{bookmain.month}}</td>             <!-- 월 -->
+                                            <!-- <td>{{bookmain.degree}}</td>            차수 -->
+                                            <td>{{bookmain.prv_balance}}</td>       <!-- 이전잔고 -->
+                                            <td>{{bookmain.add_deposit}}</td>       <!-- 추가입금 -->
+                                            <td>{{bookmain.revenue}}</td>           <!-- 수익 -->
+                                            <td>{{bookmain.change}}</td>            <!-- 증감 -->
+                                            <td>{{bookmain.change_rate}}</td>       <!-- 증감율 -->
+                                            <td>{{bookmain.trgt_add_deposit}}</td>  <!-- 목표 추가입금 -->
+                                            <td>{{bookmain.trgt_change_rate}}</td>  <!-- 목표 증감율 -->
+                                            <td>{{bookmain.trgt_revenue}}</td>      <!-- 목표 수익 -->
+                                            <td>{{bookmain.trgt_cur_balance}}</td>  <!-- 목표 잔고 -->
+                                            <td>{{bookmain.cur_balance}}</td>       <!-- 현황 금액 -->
+                                            <td>{{bookmain.achievement_rate}}</td>  <!-- 달성률   -->
+                                            <td>완료</td>        <!-- 마감여부 -->
+                                        </tr>
+                                    {% elif bookmain.finished_yn == "N" %}
+                                        <tr>
+
+                                            <td id="year">{{bookmain.year}}</td>
+                                            <td id="month">{{bookmain.month}}</td>
+                                        <!--    <td id="thisPrvBalance">{{bookmain.prv_balance}}</td> -->
+                                            <td id="thisPrvBalance">{{bookmain.prv_balance}}</td>
+                                            <td><input id="thisAddDeposit" style="width:60px;" type="text" value="{{bookmain.add_deposit}}" /></td>       <!-- 추가입금 -->
+                                            <td><input id="thisRevenue" style="width:60px;" type="text" value="{{bookmain.revenue}}"/></td>
+                                            <td id="thisChange">{{bookmain.change}}"></td>
+                                            <td id="thisChangeRate"></td>
+                                            <td id="thisTrgtAddDeposit"></td>   <!-- 목표 추가 입금 -->
+                                            <td id="thisTrgtChangeRate"></td>   <!-- 목표 증감율 -->
+                                            <td id="thisTrgtRevenue"></td>      <!-- 목표  수익 -->
+                                            <td id="thisTrgtCurBalance"></td>   <!-- 목표 수익 -->
+                                            <td id="thisCurBalance"></td>       <!-- 이달 최종 현황 -->
+                                            <td id="achievementRate"></td>      <!-- 달성률 -->
+                                            <td>
+                                                <span class="btn btn-primary btn-xs" id="btnSaveledgUpdate">저장</span>
+                                                {% if last_finished_yn == "F" %}
+                                                <span class="btn btn-danger btn-xs" id="btnSaveledgClosing">마감</span>
+                                                {% endif %}
+                                            </td>
+                                            <input type="hidden" id="thisDegree" value="{{bookmain.degree}}" />
+                                        </tr>
+                                    {% endif %}
+                                {% endfor %}
+                            {% endif %}
+                            {%if last_finished_yn == "S" %}
+                            <!---------------------------- 최초등록 ----------------------------------------------------->
+                                <tr>
+                                    <td>
+                                        <select id="year">
+                                        </select>
+                                    </td>
+                                    <td>
+                                        <select id="month">
+                                            <option>1</option>
+                                            <option>2</option>
+                                            <option>3</option>
+                                            <option>4</option>
+                                            <option>5</option>
+                                            <option>6</option>
+                                            <option>7</option>
+                                            <option>8</option>
+                                            <option>9</option>
+                                            <option>10</option>
+                                            <option>11</option>
+                                            <option>12</option>
+                                        </select>
+                                    </td>
+                                    <td>
+                                        <input type="text" style="width:60px;" id="thisPrvBalance" />
+                                    </td>
+                                    <td>
+                                        <input id="thisAddDeposit" style="width:60px;" type="text">
+                                    </td>
+                                    <td><input id="thisRevenue"style="width:60px;" type="text"></td>
+                                    <td id="thisChange"></td>
+                                    <td id="thisChangeRate"></td>
+                                    <td id="thisTrgtAddDeposit"></td>   <!-- 목표 추가 입금 -->
+                                    <td id="thisTrgtChangeRate"></td>   <!-- 목표 증감율 -->
+                                    <td id="thisTrgtRevenue"></td>      <!-- 목표  수익 -->
+                                    <td id="thisTrgtCurBalance"></td>   <!-- 목표 수익 -->
+                                    <td id="thisCurBalance"></td>       <!-- 이달 최종 현황 -->
+                                    <td id="achievementRate"></td>      <!-- 달성률 -->
+                                    <td><span class="btn btn-primary btn-xs" id="btnSaveledgNew">저장</span></td>
+                                </tr>
+                            {% elif last_finished_yn == "Y"%}
+                                <tr>
+                                    <td id="year">{{last_year}}</td>
+                                    <td id="month">{{last_month}}</td>
+                                    <td id="thisPrvBalance">{{last_prvBalance}}</td>
+                                    <td>
+                                        <input id="thisAddDeposit" style="width:60px;" type="text">
+                                    </td>
+                                    <td><input id="thisRevenue"style="width:60px;" type="text"></td>
+                                    <td id="thisChange"></td>
+                                    <td id="thisChangeRate"></td>
+                                    <td id="thisTrgtAddDeposit"></td>   <!-- 목표 추가 입금 -->
+                                    <td id="thisTrgtChangeRate"></td>   <!-- 목표 증감율 -->
+                                    <td id="thisTrgtRevenue"></td>      <!-- 목표  수익 -->
+                                    <td id="thisTrgtCurBalance"></td>   <!-- 목표 수익 -->
+                                    <td id="thisCurBalance"></td>       <!-- 이달 최종 현황 -->
+                                    <td id="achievementRate"></td>      <!-- 달성률 -->
+                                    <td><span class="btn btn-primary btn-xs" id="btnSaveledgNew">저장</span></td>
+                                </tr>
+                            {% elif last_finished_yn == "F"%}
+                                <tr>
+                                    <td id="year">{{total_year}}</td>
+                                    <td id="month">{{total_month}}</td>
+                                    <td id="thisPrvBalance">{{last_prvBalance}}</td>
+                                    <td>
+                                        <input id="thisAddDeposit" style="width:60px;" type="text">
+                                    </td>
+                                    <td><input id="thisRevenue"style="width:60px;" type="text"></td>
+                                    <td id="thisChange"></td>
+                                    <td id="thisChangeRate"></td>
+                                    <td id="thisTrgtAddDeposit"></td>   <!-- 목표 추가 입금 -->
+                                    <td id="thisTrgtChangeRate"></td>   <!-- 목표 증감율 -->
+                                    <td id="thisTrgtRevenue"></td>      <!-- 목표  수익 -->
+                                    <td id="thisTrgtCurBalance"></td>   <!-- 목표 수익 -->
+                                    <td id="thisCurBalance"></td>       <!-- 이달 최종 현황 -->
+                                    <td id="achievementRate"></td>      <!-- 달성률 -->
+                                    <td><span class="btn btn-primary btn-xs" id="btnSaveledgNew">저장</span></td>
+                                </tr>
+                            {% endif %}
+                            <!-- TODO: CSS  노가다 -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- ============================================================== -->
+    <!-- end basic table  -->
+    <!-- ============================================================== -->
+</div><!-- row -->
+
+<div class="row">
+<!-- ============================================================== -->
+<!-- basic table  -->
+<!-- ============================================================== -->
+    <div class="col-xl-7 col-lg-7 col-md-12 col-sm-12 col-12">
+        <div class="accrodion-regular">
+            <div id="accordionExpect">
+                <div class="card">
+                    <div class="card-header" id="headingExpect">
+                        <h5 class="mb-0">
+                            <button class="btn btn-link" data-toggle="collapse" data-target="#collapseExpect" aria-expanded="true" aria-controls="collapseExpect">
+                                <span class="fas fa-angle-down mr-3"></span>앞으로는...
+                           </button>
+                        </h5>
+                    </div>
+                    <!-- 열려있는 모양으로 만들고 싶을때 -->
+                    <!--<div id="collapseSeven" class="collapse show" aria-labelledby="headingSeven" data-parent="#accordion3">-->
+                    <div id="collapseExpect" class="collapse show" aria-labelledby="headingExpect" data-parent="#accordionExpect">
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-striped table-bordered first">
+                                    <thead>
+                                        <tr>
+                                            <th style="width: 15%;">연월</th>
+                                            <th>이전잔고</th>
+                                            <th style="width: 13%;">+%</th>
+                                            <th>목표잔고</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="goalArea">
+                                        <tr>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div><!-- row -->
+{% endblock bookRich%}
