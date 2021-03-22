@@ -5,8 +5,6 @@ from .models import *
 
 def tool_stock_insert_request():
     # excel 파일을 다운로드하는거와 동시에 pandas에 load하기
-    # 흔히 사용하는 df라는 변수는 data frame을 의미합니다.
-
 
     # SSL통신 통과를 위한 조치 2021-03-22
     requests = 'http://kind.krx.co.kr/corpgeneral/corpList.do?method=download'
@@ -18,6 +16,7 @@ def tool_stock_insert_request():
 
     df2 = df[['회사명', '종목코드', '업종', '주요제품', '상장일', '결산월', '대표자명', '홈페이지', '지역']].to_dict('records')
     StockInfo.objects.all().delete()
+
     for dff in df2:
         # 종목코드 확인
         stock_info = StockInfo(
@@ -33,7 +32,7 @@ def tool_stock_insert_request():
         )
         stock_info.save()
 
-    return 0
+    return; #TODO 리턴값 valchk 모듈 만들어서 정리
 
 
 def tool_stock_insert_file():

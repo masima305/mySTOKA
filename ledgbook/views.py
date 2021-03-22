@@ -234,7 +234,7 @@ def stoka_setting(request):
 # 주식들의 싱크를 맞춰서 DB에 저장해준다.
 def resync_stocks(request):
 
-    #주식 상장사 목록 가져오기
+    #주식 상장사 목록 가져오기( 리쿼스트로 가지고 옴)
     tool_stock_insert_request()
 
     context = "새로고침이 완료되었습니다."
