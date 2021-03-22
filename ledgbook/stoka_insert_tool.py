@@ -17,24 +17,25 @@ def tool_stock_insert_request():
     df2 = df[['회사명', '종목코드', '업종', '주요제품', '상장일', '결산월', '대표자명', '홈페이지', '지역']].to_dict('records')
     StockInfo.objects.all().delete()
 
-    for dff in df2:
+    for stock in df2:
         # 종목코드 확인
         stock_info = StockInfo(
-            stock_name=str(dff['회사명']).strip()
-            , stock_num=str(dff['종목코드']).strip()
-            , stock_sectors=str(dff['업종']).strip()
-            , staple_item=str(dff['주요제품']).strip()
-            , listing_date=str(dff['상장일']).strip()
-            , closing_date=str(dff['결산월']).strip()
-            , stock_owner=str(dff['대표자명']).strip()
-            , hompage_addr=str(dff['홈페이지']).strip()
-            , location_addr=str(dff['지역']).strip()
+            stock_name=str(stock['회사명']).strip()
+            , stock_num=str(stock['종목코드']).strip()
+            , stock_sectors=str(stock['업종']).strip()
+            , staple_item=str(stock['주요제품']).strip()
+            , listing_date=str(stock['상장일']).strip()
+            , closing_date=str(stock['결산월']).strip()
+            , stock_owner=str(stock['대표자명']).strip()
+            , hompage_addr=str(stock['홈페이지']).strip()
+            , location_addr=str(stock['지역']).strip()
         )
         stock_info.save()
 
     return; #TODO 리턴값 valchk 모듈 만들어서 정리
 
 
+#old. 더이상 쓰지않는다.
 def tool_stock_insert_file():
     flag =0;
 
