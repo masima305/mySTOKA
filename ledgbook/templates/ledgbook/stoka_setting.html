@@ -9,9 +9,27 @@
             }
         });
 
+        $("#addCatheNm").keypress(function (e){
+            if (e.keyCode == 13) {
+                addCathe();
+            }
+        });
+
+        $("#addCatheKeyword").keypress(function (e){
+            if (e.keyCode == 13) {
+                addCathe();
+            }
+        });
+
+        //종목검색 찾기 클릭
         $("#schStockNmBtn").click(function(){
             searchStockName();
         });
+
+        $("#addCathe").click(function(){
+            addCathe();
+        });
+
 
         //카테고리 선택하면 히든값에 해당 카테고리 임시저장
         $(".nav-link").click(function(){
@@ -24,6 +42,28 @@
         });
     }); // .ready()
 
+    //카테고리 추가
+    function addCathe(){
+        data = {
+              "cathe_name": $("#addCatheNm").val()
+            , "cathe_keyword": $("#addCatheKeyword").val()
+        }
+        $.ajax({
+            url: "{% url 'add_cathe' %}"
+            , dataType: "json"
+            , data: JSON.stringify(data)
+            , method: "POST"
+            , success: function (data) {
+                location.reload();
+            }
+            , error: function (request, status, error) {
+                console.log('실패');
+            }
+        });
+
+    }
+
+    //종목 찾기
     function searchStockName(){
          data = {
                  "sch_stock_nm": $("#schStockNm").val()
@@ -128,10 +168,6 @@
                     </a>
                     {% for cathe in cathe_list %}
                         <a class="nav-link" id="v-pills-{{cathe.cathe_num}}-tab" data-toggle="pill" href="#v-pills-{{cathe.cathe_num}}" role="tab" aria-controls="v-pills-{{cathe.cathe_num}}" aria-selected="true">{{cathe.cathe_name}}</a>
-<!--                                            <a class="nav-link active" id="v-pills-home-tab" data-toggle="pill" href="#v-pills-home" role="tab" aria-controls="v-pills-home" aria-selected="true">Tab#1</a>-->
-<!--                                            <a class="nav-link" id="v-pills-profile-tab" data-toggle="pill" href="#v-pills-profile" role="tab" aria-controls="v-pills-profile" aria-selected="false">Tab#2</a>-->
-<!--                                            <a class="nav-link" id="v-pills-messages-tab" data-toggle="pill" href="#v-pills-messages" role="tab" aria-controls="v-pills-messages" aria-selected="false">Tab#3</a>-->
-<!--                                            <a class="nav-link" id="v-pills-settings-tab" data-toggle="pill" href="#v-pills-settings" role="tab" aria-controls="v-pills-settings" aria-selected="false">Tab#4</a>-->
                     {% endfor %}
                 </div>
             </div>
@@ -149,14 +185,14 @@
                         <div class="row">
                             <div class="col-xl-9 col-lg-9 col-md-9 col-sm-9 col-9">
                                 <h3>
-                                    <input style="width: 100%;" type="text" placeholder="카테고리 이름을 입력해주세요">
+                                    <input id="addCatheNm" style="width: 100%;" type="text" placeholder="카테고리 이름을 입력해주세요">
                                 </h3>
                                 <h4>
-                                    <input style="width: 100%;" type="text" placeholder="키워드를 입력해주세요">
+                                    <input id="addCatheKeyword" style="width: 100%;" type="text" placeholder="키워드를 입력해주세요">
                                 </h4>
                             </div>
                             <div style="text-align: right" class="col-xl-3 col-lg-3 col-md-3 col-sm-3 col-3">
-                                <span class="btn btn-primary">저장</span>
+                                <span id="addCathe" class="btn btn-primary">추가</span>
                             </div>
                         </div>
                         <hr/>

@@ -90,7 +90,7 @@ class StockDailyInfo(models.Model):
 
 # 카테고리 내의 종류
 class StockCatheCd(models.Model):
-    cathe_num = models.CharField(max_length=18, blank=False, null=False, default="000")   # 카테고리번호
+    cathe_num = models.IntegerField(blank=False, null=False, default=0)   # 카테고리번호
     stock_num = models.CharField(max_length=6,  blank=False, null=False, default="000")   # 종목번호
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)          # 사용자정보
     description = models.CharField(max_length=6,  blank=False, null=False, default="000") # 카테고리 메모
@@ -100,19 +100,19 @@ class StockCatheCd(models.Model):
 # 카테고리 정보
 class StockCathe(models.Model):
     cathe_name = models.CharField(max_length=20, blank=False, null=False, default="---")    # 카테고리 이름
-    cathe_num = models.CharField(max_length=18, blank=False, null=False,  default="---")    # 카테고리 번호
+    cathe_num =  models.IntegerField(blank=False, null=False, default=0)                                  # 카테고리 번호
     cathe_keyword = models.CharField(max_length=20, blank=True, null=True)                  # 카테고리 키워드
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)            # 사용자정보
     use_yn = models.CharField(max_length=2, blank=True, null=True, default='Y')             # 사용여부
 
 # 마이그레이션 파일 생성
-#$ python manage.py makemigrations <app-name>
+#$ python manage.py makemigrations ledgbook
 
 # 마이그레이션 적용
-#$ python manage.py migrate <app-name>
+#$ python manage.py migrate ledgbook
 
 # 마이그레이션 적용 현황
-#$ python manage.py showmigrations <app-name>
+#$ python manage.py showmigrations ledgbook
 
 # 지정 마이그레이션의 SQL 내역
 #python manage.py sqlmigrate <app-name> <migration-name>

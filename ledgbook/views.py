@@ -1,6 +1,7 @@
 # selenium code
 from django.core import serializers
 from django.db.models import FloatField
+from django.db.models import Max
 
 from django.shortcuts import render, get_object_or_404
 from django.shortcuts import redirect
@@ -245,7 +246,6 @@ def resync_stocks(request):
     now = datetime.now().strftime('%Y-%m-%d')
     print(now)  # 형식 2015-04-19
 
-
     # 일부러 한개씩 업데이트를 친다.
     for stock in stock_info_list:
 
@@ -294,6 +294,30 @@ def sch_stock_list(request) :
 
     return HttpResponse(stock_list, content_type="application/json")
 
+# 카테고리 추가
+
+def add_cathe(request) :
+    if request.method == 'POST':
+        form = json.loads(request.body.decode("utf-8"))
+        user = request.user
+
+        cathe_info = StockCathe.objects.filter(user = user)
+        max_cathe_num = cathe_info.aggregate(Max('cathe_num'))['cathe_num__max']+1
+
+        print(form["cathe_keyword"])
+
+        cathe_info = StockCathe(
+            cathe_name = form["cathe_name"]
+            , cathe_num = max_cathe_num
+            , cathe_keyword = form["cathe_keyword"]
+            , user = request.user
+        )
+        context = "등록이 완료되었음"
+        cathe_info.save()
+
+    return HttpResponse(json.dumps(context), content_type="application/json")
+
+
 # 카테고리에 주식 추가
 def add_stock_cathe(request) :
     if request.method == 'POST':
@@ -324,6 +348,5 @@ def add_stock_cathe(request) :
 # 카테고리에 주식 삭제
 def delete_stock_cathe(request):
     context = "삭제호출"
-
     return HttpResponse(json.dumps(context), content_type="application/json")
 

@@ -35,10 +35,14 @@ urlpatterns = [
     #주식 리스트 확인
     , path('stoka/sch_stock_list', views.sch_stock_list  ,name='sch_stock_list')
 
-    #주식카테고리 추가
+    #카테고리에 주식 추가
     , path('stoka/add_stock_cathe', views.add_stock_cathe, name='add_stock_cathe')
 
-    #주식카테고리 삭제
+    #카테고리에 주식 삭제
     , path('stoka/delete_stock_cathe', views.delete_stock_cathe, name='delete_stock_cathe')
+
+    #카테고리 추가
+    , path('stoka/add_cathe', views.add_cathe, name='add_cathe')
+
 
 ]
