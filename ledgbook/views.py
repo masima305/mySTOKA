@@ -24,11 +24,9 @@ from datetime import datetime
 def sidebar(request):
     return render(request, "ledgbook/ledgbook_list.html")
 
-
 # 베이스 페이지
 def base(request):
     return render(request, 'ledgbook/base.html')
-
 
 #====================================================================================================
 #---------------------------------------------- LEDGBOOK --------------------------------------------
@@ -110,8 +108,6 @@ def ledgbook_rich(request):
 
     return render(request, 'ledgbook/ledgbook_rich.html', send_data)
 
-
-
 # 수익현황 신규등록
 def saveledg_new(request):
     if request.method == "POST":
@@ -144,7 +140,6 @@ def saveledg_new(request):
                 context = "new"
     return HttpResponse(json.dumps(context), content_type="application/json")
 
-
 # 수익현황 기존 업데이트
 def saveledg_update(request):
     if request.method == "POST":
@@ -176,18 +171,15 @@ def saveledg_update(request):
         context = "update"
         return HttpResponse(json.dumps(context), content_type="application/json")
 
-
 def ledgbook_list(request):
     # 키워드 : 쿼리셋에 대한 공부가 필요함.
     # posts = LedgbookPost.objects.filter(published_date__lte=timezone.now()).order_by('published_date')
     posts = LedgbookPost.objects.all()
     return render(request, 'ledgbook/ledgbook_list.html', {'posts': posts})
 
-
 def post_detail(request, pk):
     post = get_object_or_404(LedgbookPost, pk=pk)
     return render(request, 'ledgbook/ledgbook_detail.html', {'post': post})
-
 
 def post_new(request):
     if request.method == "POST":
@@ -209,6 +201,7 @@ def post_new(request):
 
 #---------------------------------------------- pages -----------------------------------------------
 
+# 메인페이지
 def stoka_main(request):
 
     now = datetime.now().strftime('%Y-%m-%d')
@@ -225,6 +218,7 @@ def stoka_main(request):
 
     return render(request, 'ledgbook/stoka_main.html',send_data)
 
+# 환경설정
 def stoka_setting(request):
     cathe_list = StockCathe.objects.filter(user=request.user, use_yn="Y").order_by('cathe_num')
     send_data = {
@@ -276,22 +270,13 @@ def resync_stocks(request):
 
 
 #---------------------------------------------- ajax -----------------------------------------------
-
+# 주식검색
 def sch_stock_list(request) :
-    context = "AAA"
     if request.method == "POST":
-    # TODO : 업데이트 시 해당 아이디에 맞는 사람 업데이트 시켜줘야함.
         if request.is_ajax():
-            if request.method == 'POST':
-                form = json.loads(request.body.decode("utf-8"))
-                print(request.body)
-                print(form["sch_stock_nm"])
-                saved_stock_info = StockInfo.objects.filter(stock_name__icontains=form["sch_stock_nm"])
-                print(saved_stock_info)
-
-                stock_list = serializers.serialize('json',saved_stock_info)
-                context = request.body
-
+            form = json.loads(request.body.decode("utf-8"))
+            saved_stock_info = StockInfo.objects.filter(stock_name__icontains=form["sch_stock_nm"])
+            stock_list = serializers.serialize('json',saved_stock_info)
     return HttpResponse(stock_list, content_type="application/json")
 
 # 카테고리 추가
@@ -314,7 +299,6 @@ def add_cathe(request) :
 
     return HttpResponse(json.dumps(context), content_type="application/json")
 
-
 # 카테고리 삭제
 def delete_cathe(request) :
     if request.method == 'POST':
@@ -336,25 +320,24 @@ def add_stock_cathe(request) :
     if request.method == 'POST':
         form = json.loads(request.body.decode("utf-8"))
         stock_num = form["stock_num"]
+        stock_name = form["stock_name"]
         cathe_num = form["cathe_num"]
+        user = request.user
 
-        print(stock_num)
-        print(cathe_num)
-        print(request.user)
-
-        stock_cathe_info = StockCatheCd.objects.filter(cathe_num = cathe_num , stock_num = stock_num)
+        stock_cathe_info = StockCatheCd.objects.filter(cathe_num = cathe_num , stock_num = stock_num, user= user)
 
         if stock_cathe_info:
             context = "이미 해당 주식이 등록되어있습니다."
         else:
             stock_cathe_info = StockCatheCd(
-                cathe_num=form["cathe_num"]  # 주식이름
-                , stock_num=form["stock_num"]  # 종목번호
-                , user=request.user  # 주식가격
+                cathe_num=cathe_num  # 카테고리번호
+                , stock_num=stock_num  # 종목번호
+                , stock_name = stock_name #종목명
+                , user=user  # 사용자
 
             )
             context = "등록이 완료되었음"
-            #stock_cathe_info.save()
+            stock_cathe_info.save()
 
     return HttpResponse(json.dumps(context), content_type="application/json")
 
@@ -363,3 +346,13 @@ def delete_stock_cathe(request):
     context = "삭제호출"
     return HttpResponse(json.dumps(context), content_type="application/json")
 
+# 카테고리에 주식 불러오기
+def reload_cathe_stocks(request):
+    if request.method == 'POST':
+        form = json.loads(request.body.decode("utf-8"))
+        cathe_num = form["cathe_num"]
+        user = request.user
+
+        cathe_stocks = StockCatheCd.objects.filter(cathe_num=cathe_num, user=user)
+        cathe_stocks = serializers.serialize('json', cathe_stocks)
+    return HttpResponse(cathe_stocks, content_type="application/json")

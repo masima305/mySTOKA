@@ -1,57 +1,63 @@
 {% extends 'ledgbook/ledgbook_sidebar.html' %}
 {% block bookRich %}
 <script type="text/javascript">
-    $(document).ready(function (){
+    $(document).ready(function () {
 
         //------ Enter Key Set --------
         //종목검색 Enter
-        $("#schStockNm").keypress(function (e){
+        $("#schStockNm").keypress(function (e) {
             if (e.keyCode == 13) {
                 searchStockName();
             }
         });
 
         // 카테고리명 Enter
-        $("#addCatheNm").keypress(function (e){
+        $("#addCatheNm").keypress(function (e) {
             if (e.keyCode == 13) {
                 addCathe();
             }
         });
 
         // 카테고리 키워드 Enter
-        $("#addCatheKeyword").keypress(function (e){
+        $("#addCatheKeyword").keypress(function (e) {
             if (e.keyCode == 13) {
                 addCathe();
             }
         });
 
 
-
         //----------- click set
-
         // 카테고리 추가 클릭
-        $("#addCathe").click(function(){
+        $("#addCathe").click(function () {
             addCathe();
         });
 
         // 종목검색 찾기 클릭
-        $("#schStockNmBtn").click(function(){
+        $("#schStockNmBtn").click(function () {
             searchStockName();
         });
 
         // 카테고리 선택하면 히든값에 해당 카테고리 임시저장
-        $(".nav-link").click(function(){
+        $(".nav-link").click(function () {
             var tmpId = $(this).attr("id").split("-")[2];
-            if(tmpId == "reg"){
+            if (tmpId == "reg") {
                 tmpId = ""
             }
             $("#selectedCatheNum").val(tmpId)  // cathe_num 추출
 
         });
 
-    }); // .ready()
+        //카테고리 누를 시 종목추가 포커스 바뀜
+        $("a[id^='v-pills-']").click(function () {
+            $("#selectedCatheNum").val(this.id.split("-")[2])
 
-    // AJAX 설정
+            // 클릭한 카테고리에 해당하는 주식 리로드
+            reloadCatheStocks();
+        });
+
+    }) // .ready()
+
+    // -----------------------------------  AJAX 설정
 
     //카테고리 추가
     function addCathe(){
@@ -145,11 +151,12 @@
 
     // 카테고리에 주식종목 추가.
     function addStockToCathe(stockNm, stockNum){
-        var catheNum =
 
+        //alert(stockNm + ": "+ stockNum + ' : '+ $("#selectedCatheNum").val())
         data = {
                    "stock_num" : stockNum
                  , "cathe_num" : $("#selectedCatheNum").val()
+                 , "stock_name": stockNm
             };
 
         $.ajax({
@@ -158,25 +165,8 @@
             , data: JSON.stringify(data)
             , method: "POST"
             , success: function (data) {
-                for(var i = 0 ; i < data.length ; i ++){
-                    console.log(data)
-
-                    tmpRow  =   "<tr>"
-                            +       "<td>"+stockNm+"</td>"
-                            +       "<td>"+stockNum+"</td>"
-                            +       "<td>미구현</td>"
-                            +       "<td>"
-                            +           "<span class='btn btn-rounded btn-secondary btn-xs'"
-                            +               " onclick='deleteStockfromCathe("+stockNm+","+stockNum+")'>삭제"
-                            +           "</span>"
-                            +       "</td>"
-                            +   "</tr>"
-                            ;
-
-                    $("#v-tbody-"+catheNum).append(tmpRow)
-                    // console.log(data[i].fields.stock_name)
-                   // console.log(data[i].fields.stock_num)
-                }
+                     reloadCatheStocks();
+            
             }
             , error: function (request, status, error) {
                 console.log('실패');
@@ -185,6 +175,45 @@
 
 
 
+    }
+
+    // 카테고리별 주식창 리프레시
+    function reloadCatheStocks(){
+        // 카테고리 입력창일경우 리프레시 안함.
+        if($("#selectedCatheNum").val() == 'reg')
+            return;
+
+        data = {
+                   "cathe_num" : $("#selectedCatheNum").val()
+            };
+
+        $.ajax({
+            url: "{% url 'reload_cathe_stocks' %}"
+            , dataType: "json"
+            , data: JSON.stringify(data)
+            , method: "POST"
+            , success: function (data) {
+
+                $("#v-tbody-"+$("#selectedCatheNum").val()).empty();
+                for (var i = 0; i < data.length; i++) {
+                    tmpRow  =   "<tr>"
+                            +       "<td>"+data[i].fields.stock_name+"</td>"
+                            +       "<td>"+data[i].fields.stock_num+"</td>"
+                            +       "<td>"+data[i].fields.sync_yn+"</td>"
+                            +       "<td>"
+                            +           "<span class='btn btn-rounded btn-secondary btn-xs'"
+                            +               " onclick='deleteStockfromCathe("+data[i].fields.cathe_num+","+data[i].fields.stock_num+")'>삭제"
+                            +           "</span>"
+                            +       "</td>"
+                            +   "</tr>"
+                            ;
+                    $("#v-tbody-"+$("#selectedCatheNum").val()).append(tmpRow)
+                }
+            }
+            , error: function (request, status, error) {
+                console.log('실패');
+            }
+        })
     }
 
 </script>
@@ -274,11 +303,13 @@
                                 </div>
                             </div>
                             <hr/>
+                            {{cathe.cathe_keyword}}
+                            <hr/>
                             <!-- row start -->
                             <div class="row">
                                 <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
                                     <table class="table table-striped">
-                                        <thead>4
+                                        <thead>
                                             <tr>
                                                 <th scope="col">종목명</th>
                                                 <th scope="col">종목번호</th>

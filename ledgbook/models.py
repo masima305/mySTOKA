@@ -63,16 +63,16 @@ class LedgbookMain(models.Model):
 # 종목정보(종목 고유정보) 모델 //
 class StockInfo(models.Model):
 
-    stock_name = models.CharField(max_length=20,blank=False, null=False)                # 회사명
-    stock_num = models.CharField(max_length=6,blank=False, null=False)                  # 종목코드
-    stock_sectors = models.CharField(max_length=80,blank=True, null=True)               # 업종
-    staple_item = models.CharField(max_length=300, blank=True, null=True)               # 주요제품
-    listing_date = models.CharField(max_length=12, blank=True, null=True)               # 상장일
-    closing_date = models.CharField(max_length=12, blank=True, null=True)               # 결산월역
-    stock_owner = models.CharField(max_length=80, blank=True, null=True)                # 대표자명
-    hompage_addr = models.CharField(max_length=80, blank=True, null=True)               # 홈페이지 주소
-    location_addr = models.CharField(max_length=80, blank=True, null=True)              # 지역
-    sync_cnt = models.CharField(max_length=10000, blank=False, null=False, default="0") # 싱크 수
+    stock_name = models.CharField(max_length=20,blank=False, null=False)                    # 회사명
+    stock_num = models.CharField(max_length=6,blank=False, null=False)                      # 종목코드
+    stock_sectors = models.CharField(max_length=80,blank=True, null=True)                   # 업종
+    staple_item = models.CharField(max_length=300, blank=True, null=True)                   # 주요제품
+    listing_date = models.CharField(max_length=12, blank=True, null=True)                   # 상장일
+    closing_date = models.CharField(max_length=12, blank=True, null=True)                   # 결산월역
+    stock_owner = models.CharField(max_length=80, blank=True, null=True)                    # 대표자명
+    hompage_addr = models.CharField(max_length=80, blank=True, null=True)                   # 홈페이지 주소
+    location_addr = models.CharField(max_length=80, blank=True, null=True)                  # 지역
+    sync_cnt = models.CharField(max_length=10000, blank=False, null=False, default="0")     # 싱크 수
 
     def publish(self):
         self.save()
@@ -92,6 +92,8 @@ class StockDailyInfo(models.Model):
 class StockCatheCd(models.Model):
     cathe_num = models.IntegerField(blank=False, null=False, default=0)   # 카테고리번호
     stock_num = models.CharField(max_length=6,  blank=False, null=False, default="000")   # 종목번호
+    stock_name = models.CharField(max_length=18, blank=False, null=False, default="---")  # 종목명
+    #stock_info = models.ForeignKey(StockInfo, on_delete=models.PROTECT)
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)          # 사용자정보
     description = models.CharField(max_length=6,  blank=False, null=False, default="000") # 카테고리 메모
     sync_yn = models.CharField(max_length=2,  blank=False, null=False, default="N")       # 종목가격 추적 YN

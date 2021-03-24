@@ -47,5 +47,7 @@ urlpatterns = [
     #카테고리 삭제
     , path('stoka/delete_cathe', views.delete_cathe, name='delete_cathe')
 
+    #카테고리별 주식 목록 불러오기
+    , path('stoka/reload_cathe_stocks', views.reload_cathe_stocks, name='reload_cathe_stocks')
 
 ]
