@@ -44,5 +44,8 @@ urlpatterns = [
     #카테고리 추가
     , path('stoka/add_cathe', views.add_cathe, name='add_cathe')
 
+    #카테고리 삭제
+    , path('stoka/delete_cathe', views.delete_cathe, name='delete_cathe')
+
 
 ]

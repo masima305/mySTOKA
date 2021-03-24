@@ -295,7 +295,6 @@ def sch_stock_list(request) :
     return HttpResponse(stock_list, content_type="application/json")
 
 # 카테고리 추가
-
 def add_cathe(request) :
     if request.method == 'POST':
         form = json.loads(request.body.decode("utf-8"))
@@ -303,8 +302,6 @@ def add_cathe(request) :
 
         cathe_info = StockCathe.objects.filter(user = user)
         max_cathe_num = cathe_info.aggregate(Max('cathe_num'))['cathe_num__max']+1
-
-        print(form["cathe_keyword"])
 
         cathe_info = StockCathe(
             cathe_name = form["cathe_name"]
@@ -317,6 +314,22 @@ def add_cathe(request) :
 
     return HttpResponse(json.dumps(context), content_type="application/json")
 
+
+# 카테고리 삭제
+def delete_cathe(request) :
+    if request.method == 'POST':
+        form = json.loads(request.body.decode("utf-8"))
+        user = request.user
+        cathe_name = form["cathe_name"]
+        cathe_num = form["cathe_num"]
+
+        cathe_info = StockCathe.objects.filter(user = user, cathe_num = cathe_num, cathe_name = cathe_name)
+
+        for cathe in cathe_info :
+            cathe.use_yn = "N"
+            cathe.save()
+        context = "삭제가 완료되었음"
+    return HttpResponse(json.dumps(context), content_type="application/json")
 
 # 카테고리에 주식 추가
 def add_stock_cathe(request) :

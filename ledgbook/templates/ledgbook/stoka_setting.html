@@ -2,6 +2,8 @@
 {% block bookRich %}
 <script type="text/javascript">
     $(document).ready(function (){
+
+        //------ Enter Key Set --------
         //종목검색 Enter
         $("#schStockNm").keypress(function (e){
             if (e.keyCode == 13) {
@@ -9,29 +11,35 @@
             }
         });
 
+        // 카테고리명 Enter
         $("#addCatheNm").keypress(function (e){
             if (e.keyCode == 13) {
                 addCathe();
             }
         });
 
+        // 카테고리 키워드 Enter
         $("#addCatheKeyword").keypress(function (e){
             if (e.keyCode == 13) {
                 addCathe();
             }
         });
 
-        //종목검색 찾기 클릭
-        $("#schStockNmBtn").click(function(){
-            searchStockName();
-        });
 
+
+        //----------- click set
+
+        // 카테고리 추가 클릭
         $("#addCathe").click(function(){
             addCathe();
         });
 
+        // 종목검색 찾기 클릭
+        $("#schStockNmBtn").click(function(){
+            searchStockName();
+        });
 
-        //카테고리 선택하면 히든값에 해당 카테고리 임시저장
+        // 카테고리 선택하면 히든값에 해당 카테고리 임시저장
         $(".nav-link").click(function(){
             var tmpId = $(this).attr("id").split("-")[2];
             if(tmpId == "reg"){
@@ -40,7 +48,10 @@
             $("#selectedCatheNum").val(tmpId)  // cathe_num 추출
 
         });
+
     }); // .ready()
+
+    // AJAX 설정
 
     //카테고리 추가
     function addCathe(){
@@ -60,7 +71,33 @@
                 console.log('실패');
             }
         });
+    }
 
+    //카테고리 삭제
+    function deleteCathe(cathe_name , cathe_num){
+
+        deleteFlag = false;
+        if(confirm("카테고리를 한번 삭제하면 복구가 불가능합니다. 삭제하시겠습니까?")) {
+            data = {
+                "cathe_name": cathe_name
+                , "cathe_num": cathe_num
+            }
+            $.ajax({
+                url: "{% url 'delete_cathe' %}"
+                , dataType: "json"
+                , data: JSON.stringify(data)
+                , method: "POST"
+                , success: function (data) {
+                    $("#catheLine_" + cathe_num).hide()
+                    $("#v-pills-" + cathe_num + "-tab").hide()
+                }
+                , error: function (request, status, error) {
+                    console.log('실패');
+                }
+            });
+        }else{
+            alert("취소되었습니다.")
+        }
     }
 
     //종목 찾기
@@ -207,11 +244,11 @@
                                 </thead>
                                 <tbody>
                                     {% for cathe in cathe_list %}
-                                        <tr>
+                                        <tr id="catheLine_{{cathe.cathe_num}}">
                                             <td>{{cathe.cathe_name}}</td>
                                             <td>{{cathe.cathe_keyword}}</td>
                                             <td>
-                                                <span href="#" class="btn btn-rounded btn-secondary btn-xs">
+                                                <span onclick="deleteCathe('{{cathe.cathe_name}}','{{cathe.cathe_num}}')" href="#" class="btn btn-rounded btn-secondary btn-xs">
                                                     삭제
                                                 </span>
                                             </td>
