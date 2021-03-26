@@ -70,10 +70,14 @@ def ledgbook_rich(request):
             last_finished_yn = bookmains[bookmains.count() - 1].finished_yn # else = Y or N
 
     # 새로운 월 정보 등록 시 필요한 것듯
-
-    last_prvBalance = bookmains[bookmains.count() - 1].cur_balance
-    last_month = int(bookmains[bookmains.count() - 1].month)+1
-    last_year = int(bookmains[bookmains.count() - 1].year)
+    if bookmains.count() > 0:
+        last_prvBalance = bookmains[bookmains.count() - 1].cur_balance
+        last_month = int(bookmains[bookmains.count() - 1].month)+1
+        last_year = int(bookmains[bookmains.count() - 1].year)
+    else :
+        last_prvBalance = 0
+        last_month = 0
+        last_year = 0
 
     #월이 막월이면 연도 +1, 월 1
     if(last_month>12) :
@@ -83,7 +87,10 @@ def ledgbook_rich(request):
 
 
     # 개인세팅
-    personalSetting = PersonalSetting.objects.get(user=request.user)
+    try :
+        personalSetting = PersonalSetting.objects.get(user=request.user)
+    except Exception :
+        personalSetting = []
 
     # 통계
 

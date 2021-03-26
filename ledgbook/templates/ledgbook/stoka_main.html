@@ -61,7 +61,7 @@
                             {% if stock_info_list %}
                                 {% for stock_info in stock_info_list %}
                                 <tr>
-                                        <td>idx</td>
+                                        <td>{{ forloop.counter }}</td>
                                         <td>{{stock_info.stock_name}}</td>        <!-- 종목명  -->
                                         <td>{{stock_info.stock_month_date}}</td>  <!-- 종목기준 -->
                                         <td>{{stock_info.stock_per}}</td>         <!-- 종목PER -->

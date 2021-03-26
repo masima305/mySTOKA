@@ -34,7 +34,7 @@
                             <div id="submenu-1" class="collapse submenu" style="">
                                 <ul class="nav flex-column">
                                     <li class="nav-item">
-                                        <a class="nav-link" href="ledgbook_rich">
+                                        <a class="nav-link" href="{% url 'ledgbook_rich' %}">
                                             수익계획
                                         </a>
                                     </li>
@@ -48,10 +48,7 @@
                             <div id="submenu-2" class="collapse submenu" style="">
                                 <ul class="nav flex-column">
                                     <li class="nav-item">
-                                        <a class="nav-link" href="pages/cards.html"> <span class="badge badge-secondary">종목 탑픽 20</span></a>
-                                    </li>
-                                    <li class="nav-item">
-                                        <a class="nav-link" href="pages/general.html">카테고리별 종목 관리</a>
+                                        <a class="nav-link" href="{% url 'stoka_main' %}">카테고리별 현황</a>
                                     </li>
 <!--                                            <li class="nav-item">-->
 <!--                                                <a class="nav-link" href="pages/carousel.html"></a>-->
@@ -63,9 +60,9 @@
                             <a class="nav-link" href="#" data-toggle="collapse" aria-expanded="false" data-target="#submenu-3" aria-controls="submenu-3"><i class="fas fa-fw fa-chart-pie"></i>설정</a>
                             <div id="submenu-3" class="collapse submenu" style="">
                                 <ul class="nav flex-column">
-<!--                                            <li class="nav-item">-->
-<!--                                                <a class="nav-link" href="pages/chart-c3.html">C3 Charts</a>-->
-<!--                                            </li>-->
+                                    <li class="nav-item">
+                                        <a class="nav-link" href="{% url 'stoka_setting' %}">카테고리 및 종목관리</a>
+                                    </li>
                                 </ul>
                             </div>
                         </li>
