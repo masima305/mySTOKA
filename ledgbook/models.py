@@ -102,7 +102,7 @@ class StockCatheCd(models.Model):
 # 카테고리 정보
 class StockCathe(models.Model):
     cathe_name = models.CharField(max_length=20, blank=False, null=False, default="---")    # 카테고리 이름
-    cathe_num =  models.IntegerField(blank=False, null=False, default=0)                                  # 카테고리 번호
+    cathe_num =  models.IntegerField(blank=False, null=False, default=0)                    # 카테고리 번호
     cathe_keyword = models.CharField(max_length=20, blank=True, null=True)                  # 카테고리 키워드
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)            # 사용자정보
     use_yn = models.CharField(max_length=2, blank=True, null=True, default='Y')             # 사용여부

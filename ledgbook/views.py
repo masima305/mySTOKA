@@ -206,7 +206,9 @@ def stoka_main(request):
 
     now = datetime.now().strftime('%Y-%m-%d')
 
-    stock_info_list = StockDailyInfo.objects.filter(stock_updt = now )#.exclude(stock_suspct_per = 'N/A')
+    # 조건1 : 둘다 N/A인거는 판단 가치가 없음.
+    stock_info_list = \
+        StockDailyInfo.objects.filter(stock_updt = now ).exclude(stock_suspct_per = 'N/A', stock_per = 'N/A')
 
     stock_info_list = stock_info_list.annotate(stock_per2=Cast('stock_per',FloatField()))\
                        .annotate(stock_suspct_per2=Cast('stock_suspct_per',FloatField()))
@@ -286,7 +288,11 @@ def add_cathe(request) :
         user = request.user
 
         cathe_info = StockCathe.objects.filter(user = user)
-        max_cathe_num = cathe_info.aggregate(Max('cathe_num'))['cathe_num__max']+1
+        if cathe_info.count() == 0 :
+            max_cathe_num = 0
+        else :
+            max_cathe_num = cathe_info.aggregate(Max('cathe_num'))['cathe_num__max']+1
+
 
         cathe_info = StockCathe(
             cathe_name = form["cathe_name"]
@@ -344,6 +350,18 @@ def add_stock_cathe(request) :
 # 카테고리에 주식 삭제
 def delete_stock_cathe(request):
     context = "삭제호출"
+    print(context)
+    if request.method == 'POST':
+        form = json.loads(request.body.decode("utf-8"))
+        stock_num = form["stock_num"]
+        cathe_num = form["cathe_num"]
+        print(stock_num)
+        print(cathe_num)
+
+        user = request.user
+
+        stock_cathe_info = StockCatheCd.objects.get(cathe_num = cathe_num , stock_num = stock_num, user= user)
+        stock_cathe_info.delete()
     return HttpResponse(json.dumps(context), content_type="application/json")
 
 # 카테고리에 주식 불러오기

@@ -152,7 +152,11 @@
     // 카테고리에 주식종목 추가.
     function addStockToCathe(stockNm, stockNum){
 
-        //alert(stockNm + ": "+ stockNum + ' : '+ $("#selectedCatheNum").val())
+        if ($("#selectedCatheNum").val() == 'reg'){
+            alert("카테고리를 선택하여 주십시오");
+            return;
+        }
+
         data = {
                    "stock_num" : stockNum
                  , "cathe_num" : $("#selectedCatheNum").val()
@@ -166,15 +170,32 @@
             , method: "POST"
             , success: function (data) {
                      reloadCatheStocks();
-            
             }
             , error: function (request, status, error) {
                 console.log('실패');
             }
         });
+    }
 
+    // 카테고리에 주식종목 삭제.
+    function deleteStockFromCathe(stockNum){
+        data = {
+                   "stock_num" : stockNum
+                 , "cathe_num" : $("#selectedCatheNum").val()
+            };
 
-
+        $.ajax({
+            url: "{% url 'delete_stock_cathe' %}"
+            , dataType: "json"
+            , data: JSON.stringify(data)
+            , method: "POST"
+            , success: function (data) {
+                     reloadCatheStocks();
+            }
+            , error: function (request, status, error) {
+                console.log('실패');
+            }
+        });
     }
 
     // 카테고리별 주식창 리프레시
@@ -202,7 +223,7 @@
                             +       "<td>"+data[i].fields.sync_yn+"</td>"
                             +       "<td>"
                             +           "<span class='btn btn-rounded btn-secondary btn-xs'"
-                            +               " onclick='deleteStockfromCathe("+data[i].fields.cathe_num+","+data[i].fields.stock_num+")'>삭제"
+                            +               " onclick='deleteStockFromCathe("+data[i].fields.stock_num+")'>삭제"
                             +           "</span>"
                             +       "</td>"
                             +   "</tr>"
