@@ -328,6 +328,22 @@ def delete_cathe(request) :
         context = "삭제가 완료되었음"
     return HttpResponse(json.dumps(context), content_type="application/json")
 
+# 카테고리 수정
+def update_cathe(request) :
+    if request.method == 'POST':
+        form = json.loads(request.body.decode("utf-8"))
+        user = request.user
+        cathe_num = form["cathe_num"]
+
+        cathe_info = StockCathe.objects.get(user = user, cathe_num = cathe_num)
+
+        cathe_info.cathe_name = form["cathe_name"]
+        cathe_info.cathe_keyword = form["cathe_keyword"]
+        cathe_info.save()
+
+        context = "수정완료"
+    return HttpResponse(json.dumps(context), content_type="application/json")
+
 # 카테고리에 주식 추가
 def add_stock_cathe(request) :
     if request.method == 'POST':

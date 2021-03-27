@@ -61,10 +61,16 @@
 
     //카테고리 추가
     function addCathe(){
+
+        var catheKeyword = $("#addCatheKeyword").val();
+        if (catheKeyword == "" || catheKeyword == undefined){
+            catheKeyword = '없음';
+        }
         data = {
               "cathe_name": $("#addCatheNm").val()
-            , "cathe_keyword": $("#addCatheKeyword").val()
+            , "cathe_keyword": catheKeyword
         }
+
         $.ajax({
             url: "{% url 'add_cathe' %}"
             , dataType: "json"
@@ -237,6 +243,39 @@
         })
     }
 
+    // 카테고리 정보 수정
+    function updateCathe(catheNum){
+        var catheInfo = $("#catheLine_"+catheNum+" input")
+
+        if($(catheInfo[0]).val() == null || $(catheInfo[0]).val() == ""){
+            alert("카테고리 이름은 반드시 입력해야합니다.");
+            return;
+        }
+
+        data = {
+                  "cathe_num"    : catheNum
+                , "cathe_name"   : $(catheInfo[0]).val()
+                , "cathe_keyword": $(catheInfo[1]).val()
+            };
+
+        $.ajax({
+            url: "{% url 'update_cathe' %}"
+            , dataType: "json"
+            , data: JSON.stringify(data)
+            , method: "POST"
+            , success: function (data) {
+                $("#v-pills-"+catheNum+"-tab").text($(catheInfo[0]).val());
+                $("#catheName_"+catheNum     ).text($(catheInfo[0]).val());
+                $("#catheKeyword_"+catheNum  ).text($(catheInfo[1]).val());
+            }
+            , error: function (request, status, error) {
+                console.log('실패');
+            }
+        })
+
+    }
+
+
 </script>
 <input id="selectedCatheNum" type="hidden" value=""/>
 <div class="section-block">
@@ -251,10 +290,10 @@
             <div class="col-xl-2 col-lg-2 col-md-6 col-sm-12 col-12">
                 <div class="nav flex-column nav-pills" id="v-pills-tab" role="tablist" aria-orientation="vertical">
                     <a style="text-align: center" class="nav-link" id="v-pills-reg-tab" data-toggle="pill" href="#v-pills-reg" role="tab" aria-controls="v-pills-reg" aria-selected="true">
-                        <i style="font-size: 1.5em;" class="fa fa-plus-circle"></i>
+                        <i style="font-size: 1.5em;" class="fas fa-cogs"></i>
                     </a>
                     {% for cathe in cathe_list %}
-                        <a class="nav-link" id="v-pills-{{cathe.cathe_num}}-tab" data-toggle="pill" href="#v-pills-{{cathe.cathe_num}}" role="tab" aria-controls="v-pills-{{cathe.cathe_num}}" aria-selected="true">{{cathe.cathe_name}}</a>
+                        <a class="nav-link" id="v-pills-{{cathe.cathe_num}}-tab" style="padding:10px;" data-toggle="pill" href="#v-pills-{{cathe.cathe_num}}" role="tab" aria-controls="v-pills-{{cathe.cathe_num}}" aria-selected="true">{{cathe.cathe_name}}</a>
                     {% endfor %}
                 </div>
             </div>
@@ -295,11 +334,18 @@
                                 <tbody>
                                     {% for cathe in cathe_list %}
                                         <tr id="catheLine_{{cathe.cathe_num}}">
-                                            <td>{{cathe.cathe_name}}</td>
-                                            <td>{{cathe.cathe_keyword}}</td>
+                                            <td>
+                                                <input type="text" value="{{cathe.cathe_name}}" />
+                                            </td>
+                                            <td>
+                                                <input type="text" value="{{cathe.cathe_keyword}}" />
+                                            </td>
                                             <td>
                                                 <span onclick="deleteCathe('{{cathe.cathe_name}}','{{cathe.cathe_num}}')" href="#" class="btn btn-rounded btn-secondary btn-xs">
                                                     삭제
+                                                </span>
+                                                <span onclick="updateCathe('{{cathe.cathe_num}}')" href="#" class="btn btn-rounded btn-brand btn-xs">
+                                                    수정
                                                 </span>
                                             </td>
                                         </tr>
@@ -315,16 +361,15 @@
                             <div class="row">
                                 <!-- 종목명 -->
                                 <div class="col-xl-9 col-lg-9 col-md-9 col-sm-9 col-9">
-                                    <h3>
+                                    <h3 id="catheName_{{cathe.cathe_num}}">
                                         {{cathe.cathe_name}}
                                     </h3>
                                 </div>
-                                <div style="text-align: right" class="col-xl-3 col-lg-3 col-md-3 col-sm-3 col-3">
-                                    <span class="btn btn-brand">수정</span>
-                                </div>
                             </div>
                             <hr/>
-                            {{cathe.cathe_keyword}}
+                                <p id="catheKeyword_{{cathe.cathe_num}}">
+                                    {{cathe.cathe_keyword}}
+                                </p>
                             <hr/>
                             <!-- row start -->
                             <div class="row">
