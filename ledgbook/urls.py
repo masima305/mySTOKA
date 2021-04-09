@@ -26,7 +26,9 @@ urlpatterns = [
 
     #--페이지
     #---메인페이지
-    , path('stoka/main', views.stoka_main, name='stoka_main')
+    #, path('stoka/main', views.stoka_main, name='stoka_main')
+
+    , path('stoka/stock_stat_cathe', views.stock_stat_cathe, name='stock_stat_cathe')
 
     #--AJAX call
     #주식 현황 싱크

@@ -209,7 +209,8 @@ def post_new(request):
 #---------------------------------------------- pages -----------------------------------------------
 
 # 메인페이지
-def stoka_main(request):
+
+def stock_stat_cathe(request):
 
     now = datetime.now().strftime('%Y-%m-%d')
 
@@ -225,7 +226,9 @@ def stoka_main(request):
         'stock_info_list' : stock_info_list
     }
 
-    return render(request, 'ledgbook/stoka_main.html',send_data)
+
+
+    return render(request, 'ledgbook/stoka_stock_stat_cathe.html',send_data)
 
 # 환경설정
 def stoka_setting(request):
@@ -373,13 +376,10 @@ def add_stock_cathe(request) :
 # 카테고리에 주식 삭제
 def delete_stock_cathe(request):
     context = "삭제호출"
-    print(context)
     if request.method == 'POST':
         form = json.loads(request.body.decode("utf-8"))
         stock_num = form["stock_num"]
         cathe_num = form["cathe_num"]
-        print(stock_num)
-        print(cathe_num)
 
         user = request.user
 
@@ -397,3 +397,5 @@ def reload_cathe_stocks(request):
         cathe_stocks = StockCatheCd.objects.filter(cathe_num=cathe_num, user=user)
         cathe_stocks = serializers.serialize('json', cathe_stocks)
     return HttpResponse(cathe_stocks, content_type="application/json")
+
+

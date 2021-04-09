@@ -8,26 +8,12 @@
                  "dummy": "dummy"
             };
 
-            $.ajax({
-                url: "{% url 'resync_stocks' %}",
-                dataType: "json",
-                method: "POST",
-                success: function (data) {
-                    alert("성공적으로 저장되었습니다.");
-                    console.log(data.context);
-                },
-                error: function (request, status, error) {
-                    console.log('실패');
-                }
-            });
         });//저장버튼 끝
     });
 </script>
 <div class="section-block">
-    <h2 class="section-title">STOKA 설정</h2>
+    <h2 class="section-title">카테고리별 현황</h2>
     <p>STOKA </p>
-    <!--TODO : 개인정보 테이블을 만들면 개인에 따른 목표일 스냅샷을 찍을 수 있도록 만들어 주고싶다. -->
-    <span class="btn btn-primary" id="btnStokaResync">저장</span>
 </div>
 <div class="row">
 <!-- ============================================================== -->
@@ -39,7 +25,7 @@
     <input type="hidden" id="total_month" value="{{total_month}}">
 </div>
 <div class="row">
-    <div class="col-xl-12 col-lg-12 col-md-12 col-sm-12 col-12">
+    <div class="col-xl-6 col-lg-6 col-md-6 col-sm-6 col-6">
         <div class="card">
             <h5 class="card-header">주식추천</h5>
             <div class="card-body">
@@ -74,7 +60,7 @@
                             <!-- TODO: CSS  노가다 -->
                         </tbody>
                     </table>
-s                </div>
+                </div>
             </div>
         </div>
     </div>
